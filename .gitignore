@@ -1,0 +1,19 @@
+# Build artifacts
+/bin/
+*.exe
+*.test
+
+# Local environment overrides — .env.example is the tracked template
+.env
+.env.local
+
+# Local config override — config.yaml.example is the tracked template
+pkg/config/config.yaml
+
+# Logs
+*.log
+
+# OS/editor cruft
+.DS_Store
+.idea/
+.vscode/
