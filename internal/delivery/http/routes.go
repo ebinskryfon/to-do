@@ -3,18 +3,16 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"todo/internal/delivery/http/handlers"
+	_ "todo/docs"
 	"todo/internal/delivery/http/middleware"
+	"todo/internal/infrastructure/container"
 )
 
-// SetupRouter registers global middleware and every route group.
-//
-// For now this only wires the health check, since the Todo feature
-// (domain/usecase/infrastructure/container) hasn't been built yet. Once it
-// is, this will take a *container.Container instead of a bare
-// *handlers.HealthHandler and add the /api/v1/todos routes here.
-func SetupRouter(log zerolog.Logger, healthHandler *handlers.HealthHandler) *gin.Engine {
+// SetupRouter registers global middleware, swagger documentation, and route groups.
+func SetupRouter(log zerolog.Logger, c *container.Container) *gin.Engine {
 	router := gin.New()
 
 	router.Use(
@@ -22,9 +20,22 @@ func SetupRouter(log zerolog.Logger, healthHandler *handlers.HealthHandler) *gin
 		middleware.Logger(log),
 		middleware.CORS(),
 		middleware.Recovery(log),
+		middleware.AuditContext(),
 	)
 
-	router.GET("/health", healthHandler.Check)
+	// Swagger documentation endpoint
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.GET("/health", c.HealthHandler.Check)
+
+	v1 := router.Group("/api/v1")
+	{
+		todos := v1.Group("/todos")
+		{
+			todos.POST("", c.TodoHandler.Create)
+			todos.GET("/:id", c.TodoHandler.GetByID)
+		}
+	}
 
 	return router
 }

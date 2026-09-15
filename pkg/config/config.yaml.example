@@ -6,3 +6,7 @@ db_user: postgres
 db_password: postgres
 db_name: todo_db
 db_sslmode: disable
+db_max_open_conns: 10
+db_max_idle_conns: 2
+db_conn_max_idle_time: 30s
+db_conn_max_lifetime: 5m

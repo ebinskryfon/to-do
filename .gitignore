@@ -1,7 +1,11 @@
 # Build artifacts
 /bin/
+/tmp/
 *.exe
 *.test
+
+# air hot-reload logs
+build-errors.log
 
 # Local environment overrides — .env.example is the tracked template
 .env
