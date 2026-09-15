@@ -9,4 +9,4 @@ import (
 
 type GetTodoUsecase interface {
 	Execute(ctx context.Context, id uuid.UUID) (*entity.Todo, error)
-}
+}
