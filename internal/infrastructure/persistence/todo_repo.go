@@ -111,6 +111,7 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 		Updates(map[string]interface{}{
 			"title":       todo.Title,
 			"description": todo.Description,
+			"completed": todo.Completed,
 			"updated_at":  todo.UpdatedAt,
 		})
 

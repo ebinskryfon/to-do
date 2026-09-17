@@ -114,7 +114,7 @@ func (h *TodoHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updateTodo, err := h.updateUC.Execute(c.Request.Context(), parsedID, req.Title, req.Description)
+	updateTodo, err := h.updateUC.Execute(c.Request.Context(), parsedID, req)
 	if err != nil {
 		h.handleError(c, err)
 		return

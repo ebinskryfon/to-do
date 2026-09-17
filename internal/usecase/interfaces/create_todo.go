@@ -2,7 +2,6 @@ package interfaces
 
 import (
 	"context"
-
 	"todo/internal/domain/entity"
 )
 
