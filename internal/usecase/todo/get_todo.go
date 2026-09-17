@@ -20,4 +20,4 @@ func NewGetTodoUsecase(repo repository.TodoRepository) interfaces.GetTodoUsecase
 
 func (uc *getTodoUsecase) Execute(ctx context.Context, id uuid.UUID) (*entity.Todo, error) {
 	return uc.repo.GetByID(ctx, id)
-}
+}

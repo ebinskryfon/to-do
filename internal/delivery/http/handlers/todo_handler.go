@@ -10,27 +10,24 @@ import (
 
 	"todo/internal/delivery/http/response"
 	domainerrors "todo/internal/domain/errors"
+	"todo/internal/types"
 	"todo/internal/usecase/interfaces"
 )
-
-// CreateTodoRequest represents the request body for creating a todo.
-type CreateTodoRequest struct {
-	Title       string `json:"title" binding:"required" example:"Buy groceries"`
-	Description string `json:"description" example:"Milk, eggs, and bread"`
-}
 
 // TodoHandler handles HTTP requests for Todo resources.
 type TodoHandler struct {
 	createUC interfaces.CreateTodoUsecase
 	getUC    interfaces.GetTodoUsecase
+	updateUC interfaces.UpdateTodoUsecase
 	log      zerolog.Logger
 }
 
 // NewTodoHandler creates a new instance of TodoHandler.
-func NewTodoHandler(createUC interfaces.CreateTodoUsecase, getUC interfaces.GetTodoUsecase, log zerolog.Logger) *TodoHandler {
+func NewTodoHandler(createUC interfaces.CreateTodoUsecase, getUC interfaces.GetTodoUsecase, updateUC interfaces.UpdateTodoUsecase, log zerolog.Logger) *TodoHandler {
 	return &TodoHandler{
 		createUC: createUC,
 		getUC:    getUC,
+		updateUC: updateUC,
 		log:      log,
 	}
 }
@@ -47,7 +44,7 @@ func NewTodoHandler(createUC interfaces.CreateTodoUsecase, getUC interfaces.GetT
 // @Failure 500 {object} response.Envelope{error=response.ErrorBody}
 // @Router /api/v1/todos [post]
 func (h *TodoHandler) Create(c *gin.Context) {
-	var req CreateTodoRequest
+	var req types.CreateTodoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", err.Error())
 		return
@@ -100,4 +97,29 @@ func (h *TodoHandler) GetByID(c *gin.Context) {
 		return
 	}
 	response.Success(c, todo)
+}
+
+func (h *TodoHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", "invalid todo id")
+		return
+	}
+
+	var req types.UpdateTodoRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", err.Error())
+		return
+	}
+
+	updateTodo, err := h.updateUC.Execute(c.Request.Context(), parsedID, req)
+	if err != nil {
+		h.handleError(c, err)
+		return
+	}
+
+	response.Success(c, updateTodo)
+
 }

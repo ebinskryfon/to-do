@@ -103,3 +103,25 @@ func (r *todoRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.Tod
 	t := m.toEntity()
 	return &t, nil
 }
+
+func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
+	result := r.db.WithContext(ctx).
+		Model(&todoModel{}).
+		Where("id = ? AND is_active = ? AND deleted_at IS NULL", todo.ID, true).
+		Updates(map[string]interface{}{
+			"title":       todo.Title,
+			"description": todo.Description,
+			"completed": todo.Completed,
+			"updated_at":  todo.UpdatedAt,
+		})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return domainerrors.ErrTodoNotFound
+	}
+
+	return nil
+}

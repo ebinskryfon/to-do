@@ -34,6 +34,7 @@ func SetupRouter(log zerolog.Logger, c *container.Container) *gin.Engine {
 		{
 			todos.POST("", c.TodoHandler.Create)
 			todos.GET("/:id", c.TodoHandler.GetByID)
+			todos.PUT("/:id", c.TodoHandler.Update)
 		}
 	}
 
