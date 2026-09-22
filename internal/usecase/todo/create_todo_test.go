@@ -42,6 +42,10 @@ func (m *mockTodoRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
+func (m *mockTodoRepo) UpdateStatus(ctx context.Context, id uuid.UUID, completed bool) error {
+	return nil
+}
+
 func TestCreateTodoUsecase_Success(t *testing.T) {
 	repo := &mockTodoRepo{}
 	uc := todo.NewCreateTodoUsecase(repo)

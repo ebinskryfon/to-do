@@ -36,6 +36,8 @@ func SetupRouter(log zerolog.Logger, c *container.Container) *gin.Engine {
 			todos.GET("/:id", c.TodoHandler.GetByID)
 			todos.PUT("/:id", c.TodoHandler.Update)
 			todos.GET("", c.TodoHandler.List)
+			todos.DELETE("/:id",c.TodoHandler.Delete)
+			todos.PATCH("/:id/status", c.TodoHandler.UpdateStatus)
 		}
 	}
 

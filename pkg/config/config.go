@@ -76,8 +76,8 @@ func Load() (*Config, error) {
 	v.SetDefault("database_url", "")
 	v.SetDefault("db_host", "localhost")
 	v.SetDefault("db_port", "5432")
-	v.SetDefault("db_user", "postgres")
-	v.SetDefault("db_password", "postgres")
+	v.SetDefault("db_user", "Aby")
+	v.SetDefault("db_password", "Aby.2026")
 	v.SetDefault("db_name", "todo_db")
 	v.SetDefault("db_sslmode", "disable")
 
