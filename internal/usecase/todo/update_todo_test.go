@@ -56,8 +56,13 @@ func (m *mockUpdateTodoRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
+func (m *mockUpdateTodoRepo) UpdateStatus(ctx context.Context, id uuid.UUID, completed bool) error {
+	return nil
+}
+
 func TestUpdateTodoUsecase_Success(t *testing.T) {
 	targetID := uuid.New()
+	completed := true
 	oldTime := time.Now().UTC().Add(-time.Hour)
 
 	existingTodo := &entity.Todo{
@@ -81,7 +86,7 @@ func TestUpdateTodoUsecase_Success(t *testing.T) {
 	req := types.UpdateTodoRequest {
 		Title: "New Title",
 		Description: "New Description",
-		Completed: true,
+		Completed: &completed,
 	}
 
 	result, err := uc.Execute(context.Background(), targetID, req)
