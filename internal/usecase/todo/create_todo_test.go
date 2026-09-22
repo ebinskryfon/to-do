@@ -30,8 +30,8 @@ func (m *mockTodoRepo) GetByID(ctx context.Context, id uuid.UUID) (*entity.Todo,
 	return nil, nil
 }
 
-func (m *mockTodoRepo) List(ctx context.Context) ([]entity.Todo, error) {
-	return nil, nil
+func (m *mockTodoRepo) List(ctx context.Context, page, pageSize int, completed *bool) ([]entity.Todo, int, error) {
+	return nil, 0, nil
 }
 
 func (m *mockTodoRepo) Update(ctx context.Context, t *entity.Todo) error {

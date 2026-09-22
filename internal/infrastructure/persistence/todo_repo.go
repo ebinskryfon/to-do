@@ -125,3 +125,38 @@ func (r *todoRepository) Update(ctx context.Context, todo *entity.Todo) error {
 
 	return nil
 }
+
+func (r *todoRepository) List(ctx context.Context, page, pageSize int, completed *bool) ([]entity.Todo, int, error) {
+	var m []todoModel
+	var todos []entity.Todo
+	var total int64
+	
+	query := r.db.WithContext(ctx).
+		Model(todoModel{}).
+		Where("is_active = ? AND deleted_at IS NULL", true)
+
+	if completed != nil {
+		query = query.Where("completed = ?", *completed)
+	}
+
+	res := query.Count(&total)
+	if res.Error != nil {
+		return nil, 0, res.Error
+	}
+
+	offset := (page - 1)*pageSize
+	query = query.Offset(offset)
+	query = query.Limit(pageSize)
+
+	res = query.Find(&m)
+	if res.Error != nil {
+		return nil, 0, res.Error
+	}
+
+	for _, model := range m {
+		mt := model.toEntity()
+		todos = append(todos, mt)
+	}
+
+	return todos, int(total), nil
+}
