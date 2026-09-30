@@ -21,16 +21,20 @@ type TodoHandler struct {
 	getUC    interfaces.GetTodoUsecase
 	updateUC interfaces.UpdateTodoUsecase
 	listUC interfaces.ListTodoUsecase
+	deleteUC interfaces.DeleteTodoUsecase
+	updateTodoStatusUC interfaces.UpdateTodoStatusUsecase
 	log      zerolog.Logger
 }
 
 // NewTodoHandler creates a new instance of TodoHandler.
-func NewTodoHandler(createUC interfaces.CreateTodoUsecase, getUC interfaces.GetTodoUsecase, updateUC interfaces.UpdateTodoUsecase,listUC interfaces.ListTodoUsecase, log zerolog.Logger) *TodoHandler {
+func NewTodoHandler(createUC interfaces.CreateTodoUsecase, getUC interfaces.GetTodoUsecase, updateUC interfaces.UpdateTodoUsecase,listUC interfaces.ListTodoUsecase, deleteUC interfaces.DeleteTodoUsecase, updateTodoStatusUC interfaces.UpdateTodoStatusUsecase, log zerolog.Logger) *TodoHandler {
 	return &TodoHandler{
 		createUC: createUC,
 		getUC:    getUC,
 		updateUC: updateUC,
 		listUC:	  listUC,
+		deleteUC: deleteUC,
+		updateTodoStatusUC: updateTodoStatusUC,
 		log:      log,
 	}
 }
@@ -180,4 +184,50 @@ func (h *TodoHandler) List(c *gin.Context) {
 		return
 	}
 	response.Paginated(c, todos, total)
+}
+
+func (h *TodoHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", "invalid todo id")
+		return
+	}
+
+	err = h.deleteUC.Execute(c.Request.Context(), parsedID)
+	if err != nil {
+		h.handleError(c, err)
+		return
+	}
+	response.Success(c, nil)
+}
+
+func (h *TodoHandler) UpdateStatus(c *gin.Context) {
+	id := c.Param("id")
+
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", "invalid todo id")
+		return
+	}
+
+	var req types.UpdateTodoRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", err.Error())
+		return
+	}
+
+	if req.Completed == nil {
+		response.Error(c, http.StatusBadRequest, "INVALID_INPUT", "invalid value for completed")
+		return
+	}
+
+	err = h.updateTodoStatusUC.Execute(c.Request.Context(), parsedID, *req.Completed)
+	if err != nil {
+		h.handleError(c, err)
+		return
+	}
+
+	response.Success(c, nil)
 }

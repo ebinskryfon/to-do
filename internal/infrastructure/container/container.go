@@ -21,6 +21,8 @@ type Container struct {
 	GetTodoUsecase    interfaces.GetTodoUsecase
 	UpdateTodoUsecase interfaces.UpdateTodoUsecase
 	ListTodoUsecase	  interfaces.ListTodoUsecase
+	DeleteTodoUsecase interfaces.DeleteTodoUsecase
+	UpdateTodoStatusUsecase interfaces.UpdateTodoStatusUsecase
 
 	// Handlers
 	TodoHandler   *handlers.TodoHandler
@@ -37,9 +39,11 @@ func NewContainer(db *gorm.DB, log zerolog.Logger) *Container {
 	getTodoUC := todo.NewGetTodoUsecase(todoRepo)
 	updateTodoUC := todo.NewUpdateTodoUsecase(todoRepo)
 	listTodoUC := todo.NewListTodoUsecase(todoRepo)
+	deleteTodoUC := todo.NewDeleteTodoUsecase(todoRepo)
+	updateTodoStatusUC := todo.NewUpdateTodoStatusUsecase(todoRepo)
 
 	// 3. Delivery / Handler Layer
-	todoHandler := handlers.NewTodoHandler(createTodoUC, getTodoUC, updateTodoUC, listTodoUC, log)
+	todoHandler := handlers.NewTodoHandler(createTodoUC, getTodoUC, updateTodoUC, listTodoUC, deleteTodoUC, updateTodoStatusUC, log)
 	healthHandler := handlers.NewHealthHandler()
 
 	return &Container{
@@ -48,6 +52,8 @@ func NewContainer(db *gorm.DB, log zerolog.Logger) *Container {
 		GetTodoUsecase:    getTodoUC,
 		UpdateTodoUsecase: updateTodoUC,
 		ListTodoUsecase: listTodoUC,
+		DeleteTodoUsecase: deleteTodoUC,
+		UpdateTodoStatusUsecase: updateTodoStatusUC,
 		TodoHandler:       todoHandler,
 		HealthHandler:     healthHandler,
 	}

@@ -38,6 +38,10 @@ func (m *mockGetTodoRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
+func (m *mockGetTodoRepo) UpdateStatus(ctx context.Context, id uuid.UUID, completed bool) error {
+	return nil
+}
+
 func TestGetTodoUsecase_Success(t *testing.T) {
 	targetID := uuid.New()
 	expectedTodo := &entity.Todo{

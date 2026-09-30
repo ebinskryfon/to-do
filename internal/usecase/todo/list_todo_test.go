@@ -47,6 +47,10 @@ func (m *mockListTodoRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
+func (m *mockListTodoRepo) UpdateStatus(ctx context.Context, id uuid.UUID, completed bool) error {
+	return nil
+}
+
 func TestListTodoUsecase_Success(t *testing.T) {
 	todo1 := entity.Todo{
 		ID:    uuid.New(),

@@ -41,7 +41,7 @@ func (uc *updateTodoUsecase) Execute(ctx context.Context, id uuid.UUID, req type
 
 	existingTodo.UpdatedAt = time.Now().UTC()
 
-	if req.Completed == true {
+	if *req.Completed == true {
 		existingTodo.Completed = true
 	} else {
 		existingTodo.Completed = false

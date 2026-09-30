@@ -160,3 +160,43 @@ func (r *todoRepository) List(ctx context.Context, page, pageSize int, completed
 
 	return todos, int(total), nil
 }
+
+func (r *todoRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	res := r.db.WithContext(ctx).
+		Model(&todoModel{}).
+		Where("id = ? AND is_active = ? AND deleted_at IS NULL", id, true).
+		Updates(map[string]interface{} {
+			"is_active": false,
+			"deleted_at": time.Now().UTC(),
+		})
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return domainerrors.ErrTodoNotFound
+	}
+
+	return nil
+}
+
+func (r *todoRepository) UpdateStatus(ctx context.Context, id uuid.UUID, completed bool) error {
+	res := r.db.WithContext(ctx).
+		Model(&todoModel{}).
+		Where("id = ? AND is_active = ? AND deleted_at IS NULL", id, true).
+		Updates(map[string]interface{} {
+			"completed": completed,
+			"updated_at": time.Now().UTC(),
+		})
+
+	if res.Error != nil {
+		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return domainerrors.ErrTodoNotFound
+	}
+
+	return nil
+}
